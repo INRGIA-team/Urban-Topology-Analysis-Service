@@ -1,5 +1,0 @@
-fastapi
-SQLAlchemy
-psycopg2-binary
-uvicorn
-loguru
