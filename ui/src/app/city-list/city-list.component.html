@@ -21,4 +21,7 @@
             </div>
         </a>
     </div>
+    <p style="text-align: center;" *ngIf="!noMoreCities">
+        <button (click)="onLoadMore()">Load more</button>
+    </p>
 </div>

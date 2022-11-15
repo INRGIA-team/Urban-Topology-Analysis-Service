@@ -10,8 +10,10 @@ import { TownService } from '../services/town.service';
   styleUrls: ['./city-list.component.css']
 })
 export class CityListComponent implements OnInit {
-  page = 1;
-  per_page = 9;
+  page = 0;
+  per_page = 99;
+  noMoreCities = false;
+
   towns: Town[] = [];
   filtredTowns = new BehaviorSubject<Town[]>([]); //BehaviorSubject как observe но можем вручную менять значения, хранит текущее значение
   search = new FormControl('');
@@ -38,5 +40,15 @@ export class CityListComponent implements OnInit {
     const zoom = 10;
 
     return `http://static-maps.yandex.ru/1.x/?lang=en-US&ll=${center.longitude},${center.latitude}&size=450,450&z=${zoom}&l=map`
+  }
+
+  onLoadMore(){
+    this.townService.getTowns(this.page + 1, this.per_page).subscribe(res => {
+      this.page += 1;
+      if(res.length < this.per_page) this.noMoreCities = true;
+      this.towns.push(...res);
+      this.search.reset();
+      // this.filtredTowns.next(this.towns);
+    })
   }
 }
