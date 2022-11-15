@@ -10,6 +10,8 @@ import { TownService } from '../services/town.service';
   styleUrls: ['./city-list.component.css']
 })
 export class CityListComponent implements OnInit {
+  page = 1;
+  per_page = 9;
   towns: Town[] = [];
   filtredTowns = new BehaviorSubject<Town[]>([]); //BehaviorSubject как observe но можем вручную менять значения, хранит текущее значение
   search = new FormControl('');
@@ -20,21 +22,21 @@ export class CityListComponent implements OnInit {
     this.search.valueChanges.subscribe(val => {
       const value = val;
       if(!value) {this.filtredTowns.next(this.towns); return;} //меняем текушее значение как this.filtredTowns.next(this.towns)
-      const f = this.towns.filter(t => t.name.toLowerCase().includes(val.toLowerCase())) //список городов, содержащих подстрооку val
+      const f = this.towns.filter(t => t.city_name.toLowerCase().includes(val.toLowerCase())) //список городов, содержащих подстрооку val
       this.filtredTowns.next(f);
     })
   }
 
   ngOnInit(): void {
-    this.townService.getTowns().subscribe(towns => {
-      this.towns=towns;
+    this.townService.getTowns(this.page, this.per_page).subscribe(towns => {
+      this.towns = towns;
       this.filtredTowns.next(towns);
     });
   }
 
-  getImage(bounds: {lat: number, lon: number}): string{
+  getImage(center: {longitude: number,latitude: number}): string{
     const zoom = 10;
 
-    return `http://static-maps.yandex.ru/1.x/?lang=en-US&ll=${bounds.lon},${bounds.lat}&size=450,450&z=${zoom}&l=map`
+    return `http://static-maps.yandex.ru/1.x/?lang=en-US&ll=${center.longitude},${center.latitude}&size=450,450&z=${zoom}&l=map`
   }
 }

@@ -41,7 +41,7 @@ export class MapComponent implements OnInit {
   } 
   get center(): L.LatLngTuple{return this._center;}
 
-  @Input() cityFeatures: _districts = {city: [], children: [], subchildren: [] }
+  @Input() cityFeatures: _districts = {0: [], 1: [], 2: [] }
 
 
   manualPolygonsMode: boolean = false; //true - задаем районы в ручную false-смотрим на имеющиеся
@@ -164,13 +164,25 @@ export class MapComponent implements OnInit {
     delete this.onClickHandler;
     this.distLOD?.show();
 
-    this.drawDistricts();
+    this.drawDistricts(this.districtLevel);
   }
 
-  drawDistricts(){
+  drawDistricts(depth: districtLevels){
+
     this.districts.clearLayers();
-    this.cityFeatures[this.districtLevel].map(d => {
-      this.drawGeoJson(d as GeoJsonObject, d.properties.local_name)
+    this.cityFeatures[depth].map(d => {
+      this.drawGeoJson({
+        type: "Feature",
+        properties: {
+          osm_id: d.id,
+          local_name: d.name
+        },
+        geometry: {
+          type: d.type || 'Polygon',
+          coordinates: d.regions
+        }
+        
+      } as GeoJsonObject, d.name)
     });
   }
 
@@ -234,11 +246,11 @@ export class MapComponent implements OnInit {
     const graphTools = PolygonMode(() => this.onManualPolygons(), () => this.onDistrictPolygons()) //класс (по конструктору класса)
     this.graphTools = new graphTools().addTo(map); //экземпляр класса
 
-    const level = Object.keys(districtLevels).findIndex(key => key == this.districtLevel);
+    const level = Object.keys(districtLevels).findIndex(key => Number(key) == this.districtLevel);
     const distLOD = LODControl((ev: any) => {
       const value = ev.target.value ? ev.target.value : 0;
-      this.districtLevel = Object.keys(districtLevels)[value] as districtLevels;
-      this.drawDistricts();
+      this.districtLevel = value as districtLevels;
+      this.drawDistricts(this.districtLevel );
     }, level, 3);
     this.distLOD = new distLOD().addTo(map);
   }

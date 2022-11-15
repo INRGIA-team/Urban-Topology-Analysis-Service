@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Town, _distBounds, _districts } from '../interfaces/town';
+import { Region, Town, _distBounds, _districts } from '../interfaces/town';
 import { FileService } from '../services/file.service';
 import { TownService } from '../services/town.service';
 import * as L from 'leaflet'; //* - все
@@ -46,10 +46,11 @@ export class TownComponent implements OnInit{
       let id = params.get('id');
       if(id){
         this.id=id;
-        this.townService.getTown(id).subscribe(
+        this.townService.getTown( id ).subscribe(
           town=>{
-            this.town=town;
-            if(town.districtFolder) this.getDistricts(town);
+            this.town = town;
+            // if(town.districtFolder) 
+            this.getDistricts(town);
           },
           error=>{this.router.navigate(['/towns'])}
         )
@@ -61,26 +62,32 @@ export class TownComponent implements OnInit{
 
   getCenter(): L.LatLngTuple{
     if(!this.town) return [59.9414, 30.3267];
-    return [ this.town.center.lat, this.town.center.lon ];
+    return [ this.town.property.center.latitude, this.town.property.center.longitude ];
   }
 
   getDistricts(town: Town): void{
-    Object.keys(districtLevels).map(filename => {
-      this.fileService.readJson(`/assets/districts/${town.districtFolder}/${filename == 'city' ? town.districtFolder : filename}.json`).subscribe((res: any) => {
-        const info = res as _distBounds;
-        town.districts[filename as districtLevels] = info.features;
-      })
-    })
+    // Object.keys(districtLevels).map(filename => {
+    //   this.fileService.readJson(`/assets/districts/${town.districtFolder}/${filename == 'city' ? town.districtFolder : filename}.json`).subscribe((res: any) => {
+    //     const info = res as _distBounds;
+    //     town.districts[filename as districtLevels] = info.features;
+    //   })
+    // })
+
+    town.districts = {0: [], 1: [], 2: []};
+    [2, 1, 0].forEach(key => this.townService.getTownRegions(town.id, key).subscribe(res => {
+      town.districts[key as districtLevels] = res;
+    }) )
+    
   }
 
-  getFeatures(){
-    if(!this.town) return { city: [], children: [], subchildren: [] };
-    return {
-      city: this.town.districts.city,
-      children: this.town.districts.children,
-      subchildren: this.town.districts.subchildren
-    }
-  }
+  // getFeatures(){
+  //   if(!this.town) return { city: [], children: [], subchildren: [] };
+  //   return {
+  //     city: this.town.districts.city,
+  //     children: this.town.districts.children,
+  //     subchildren: this.town.districts.subchildren
+  //   }
+  // }
 
   handlePolygon(ev: {name: string, polygon: any}){
     this.graph = true;
