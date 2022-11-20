@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, AfterViewInit, ElementRef, OnDestroy, Inp
 import { FileService } from '../services/file.service';
 import { FormControl } from '@angular/forms';
 import {density, diameter, simpleSize} from 'graphology-metrics/graph';
-import { Csv2Graph } from './csv2graph';
 import { tap, zip } from 'rxjs';
 import Sigma from "sigma";
 import Graph from 'graphology';
@@ -11,6 +10,10 @@ import forceAtlas2 from 'graphology-layout-forceatlas2';
 import circular from "graphology-layout/circular";
 import {AbstractGraph} from 'graphology-types';
 import saveAs from './saveAsPNG';
+import { GraphData, GraphDataSrvice } from '../services/graph-data.service';
+
+var graphml = require('graphology-graphml/browser');
+var Graphology = require('graphology');
 
 @Component({
   selector: 'app-graph',
@@ -21,10 +24,7 @@ export class GraphComponent implements OnInit, AfterViewInit {
   @ViewChild('sigmaContainer') container!: ElementRef;
   @Input() name?: string;
 
-
-  @Input() dotSize: number = 5;
-  @Input() lineSize: number = 3;
-  @Input() roads: boolean = false;
+  @Input() graphData?: GraphData;
 
   metrics?: {density: number, diameter: number, simpleSize: number};
 
@@ -34,9 +34,9 @@ export class GraphComponent implements OnInit, AfterViewInit {
   labelsThreshold = new FormControl<number>(0);
 
   constructor(
-    private fileService: FileService,
     private cdRef: ChangeDetectorRef,
-    private csv2graph: Csv2Graph
+    private gdService: GraphDataSrvice,
+    private fileService: FileService,
   ) {
     // this.graph = Graph.from(data as SerializedGraph);
     // this.graph = Graph.from(smallGraph as SerializedGraph);
@@ -47,17 +47,24 @@ export class GraphComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.graph = new Graph();
-
-    zip(
-      this.fileService.readFile('/assets/graphs/nodes.csv').pipe(tap(nodesStr => this.csv2graph.getNodesFromCsv(this.graph, nodesStr, {color: 'black', size: this.dotSize}))),
-      this.fileService.readFile('/assets/graphs/graph.csv').pipe(tap(edgesStr => this.csv2graph.getEdgesFromCsv(this.graph, edgesStr, {color: 'black', size: this.lineSize})))
-    ).subscribe(res => {
-      this.graph.addNode('adasd', {x: 1, y: 1})
-
-      this.getMetrics();
+    this.fileService.readFile('/assets/graphs/MurinoLO-4_graphml (1).graphml').subscribe(res => {
+      this.graph = graphml.parse(Graphology, res);
+      this.setAttributes();
       this.render();
-    })
+      this.getMetrics();
+    });
+    // this.graph = new Graph();
+    // if(!this.graphData) return;
+
+    // const inters = this.gdService.streetsToIntersections(this.graphData);
+
+
+    // inters.nodes.forEach(node => this.graph.addNode(node.node_id, {x: Number(node.lat), y: Number(node.lon), size: 5}));
+    // inters.edges.forEach(edge => this.graph.addEdge(edge.from, edge.to, {label: edge.street_name, size: 5}));
+
+    // this.getMetrics();
+
+    // this.render();
   }
 
   getMetrics(){
@@ -94,13 +101,25 @@ export class GraphComponent implements OnInit, AfterViewInit {
     })
     
   }
-
+  
   render(){
-    // initiate sigma
-    if(!this.roads){
-      circular.assign(this.graph);
-      forceAtlas2.assign(this.graph, { settings: forceAtlas2.inferSettings(this.graph),  iterations: 600 });
-    }
+    if(!this.graph) return;
+
+    // const degrees = this.graph.nodes().map((node) => this.graph.degree(node));
+    // const minDegree = Math.min(...degrees);
+    // const maxDegree = Math.max(...degrees);
+    // const minSize = 2, maxSize = 10;
+    // this.graph.forEachNode((node) => {
+    //   const degree = this.graph.degree(node);
+    //   this.graph.setNodeAttribute(
+    //     node,
+    //     "size",
+    //     minSize +((degree - minDegree) / (maxDegree - minDegree)) * (maxSize - minSize)
+    //   );
+    // });
+
+    circular.assign(this.graph);
+    forceAtlas2.assign(this.graph, { settings: forceAtlas2.inferSettings(this.graph),  iterations: 600 });
     // this.forceLayout = new ForceSupervisor(this.graph, {settings: {repulsion: 1, inertia: 0.3}});
     // this.forceLayout = new FA2Layout(graph, {settings: forceAtlas2.inferSettings(this.graph)});
     // this.forceLayout?.start();
@@ -114,7 +133,6 @@ export class GraphComponent implements OnInit, AfterViewInit {
 
     const labelsThreshold = this.renderer.getSetting("labelRenderedSizeThreshold");
     if(labelsThreshold) this.labelsThreshold.setValue( labelsThreshold );
-    
   }
 
 
