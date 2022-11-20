@@ -1,4 +1,8 @@
-*/node_modules
+node_modules
+ui/node_modules
 *.angular
 logs
 docker-compose.yaml
+__pycache__
+.vscode
+package-lock.json

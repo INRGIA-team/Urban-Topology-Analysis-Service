@@ -4,7 +4,6 @@ import { Region, Town, _distBounds, _districts } from '../interfaces/town';
 import { FileService } from '../services/file.service';
 import { TownService } from '../services/town.service';
 import * as L from 'leaflet'; //* - все
-import { GraphComponent } from '../graph/graph.component';
 import { districtLevels } from '../interfaces/town';
 
 enum sections{

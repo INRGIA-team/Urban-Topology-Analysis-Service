@@ -1,42 +1,42 @@
 import { Component, OnInit, ViewChild, AfterViewInit, ElementRef, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
-import {AbstractGraph } from "graphology-types";
-import Sigma from "sigma";
-import iwanthue from "iwanthue";
 import { FileService } from '../services/file.service';
 import { FormControl } from '@angular/forms';
-import ForceSupervisor from "graphology-layout-force/worker";
-import forceAtlas2 from 'graphology-layout-forceatlas2';
-import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import {density, diameter, simpleSize} from 'graphology-metrics/graph';
-import saveAsPNG from './saveAsPNG';
-
-var graphml = require('graphology-graphml/browser');
-var Graphology = require('graphology');
+import { Csv2Graph } from './csv2graph';
+import { tap, zip } from 'rxjs';
+import Sigma from "sigma";
+import Graph from 'graphology';
+import iwanthue from "iwanthue";
+import forceAtlas2 from 'graphology-layout-forceatlas2';
+import circular from "graphology-layout/circular";
+import {AbstractGraph} from 'graphology-types';
+import saveAs from './saveAsPNG';
 
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.css']
 })
-export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
+export class GraphComponent implements OnInit, AfterViewInit {
   @ViewChild('sigmaContainer') container!: ElementRef;
   @Input() name?: string;
 
-  metrics?: {
-    density: number, diameter: number, simpleSize: number
-  };
+
+  @Input() dotSize: number = 5;
+  @Input() lineSize: number = 3;
+  @Input() roads: boolean = false;
+
+  metrics?: {density: number, diameter: number, simpleSize: number};
 
   graph!: AbstractGraph;
   renderer?: Sigma;
   palette: string[] = [];
-
-  forceLayout?: ForceSupervisor;
-
   labelsThreshold = new FormControl<number>(0);
 
   constructor(
     private fileService: FileService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private csv2graph: Csv2Graph
   ) {
     // this.graph = Graph.from(data as SerializedGraph);
     // this.graph = Graph.from(smallGraph as SerializedGraph);
@@ -47,16 +47,17 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.fileService.readFile('/assets/graphs/MurinoLO-4_graphml (1).graphml').subscribe(res => {
-      this.graph = graphml.parse(Graphology, res);
-      this.setAttributes();
-      this.render();
-      this.getMetrics();
-    });
-  }
+    this.graph = new Graph();
 
-  ngOnDestroy(): void {
-    this.forceLayout?.kill();
+    zip(
+      this.fileService.readFile('/assets/graphs/nodes.csv').pipe(tap(nodesStr => this.csv2graph.getNodesFromCsv(this.graph, nodesStr, {color: 'black', size: this.dotSize}))),
+      this.fileService.readFile('/assets/graphs/graph.csv').pipe(tap(edgesStr => this.csv2graph.getEdgesFromCsv(this.graph, edgesStr, {color: 'black', size: this.lineSize})))
+    ).subscribe(res => {
+      this.graph.addNode('adasd', {x: 1, y: 1})
+
+      this.getMetrics();
+      this.render();
+    })
   }
 
   getMetrics(){
@@ -96,25 +97,31 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
   render(){
     // initiate sigma
-    this.renderer = new Sigma(this.graph, this.container.nativeElement);
-  
+    if(!this.roads){
+      circular.assign(this.graph);
+      forceAtlas2.assign(this.graph, { settings: forceAtlas2.inferSettings(this.graph),  iterations: 600 });
+    }
     // this.forceLayout = new ForceSupervisor(this.graph, {settings: {repulsion: 1, inertia: 0.3}});
-    this.forceLayout = new FA2Layout(this.graph, {settings: forceAtlas2.inferSettings(this.graph)});
-    this.forceLayout?.start();
+    // this.forceLayout = new FA2Layout(graph, {settings: forceAtlas2.inferSettings(this.graph)});
+    // this.forceLayout?.start();
 
+
+    this.renderer = new Sigma(this.graph as any, this.container.nativeElement,  {renderEdgeLabels: true, renderLabels: true});
+    
     this.labelsThreshold.valueChanges.subscribe(val => {
-      if(this.renderer)
-      this.renderer.setSetting("labelRenderedSizeThreshold", + (val ? val : 0));
+      this.renderer?.setSetting("labelRenderedSizeThreshold", + (val ? val : 0));
     })
 
     const labelsThreshold = this.renderer.getSetting("labelRenderedSizeThreshold");
     if(labelsThreshold) this.labelsThreshold.setValue( labelsThreshold );
+    
   }
 
-  onSaveAsPng(){
+
+  onSaveAs(type: 'png' | 'svg'){
     if(!this.renderer) return;
-    const layers = ["edges", "nodes", "labels"];  
-    saveAsPNG(this.renderer, layers);
-  }
 
+    const layers = ["edges", "nodes", "labels"];  
+    saveAs( type, this.renderer, layers);
+  }
 }

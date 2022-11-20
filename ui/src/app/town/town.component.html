@@ -13,11 +13,11 @@
     <div class="graphWrapper">
         <div  style="height: 100vh">
             <a name="graph"></a>
-            <app-graph *ngIf="graph" #graphComponent [name]="graphName"></app-graph>
+            <app-graph *ngIf="graph" [dotSize]="10" [lineSize]="3" [roads]="false" #graphComponent [name]="graphName"></app-graph>
         </div>
         <div style="height: 100vh">
             <a name="roads"></a>
-            <app-roads *ngIf="roadBounds" [bounds]="roadBounds"></app-roads>
+            <app-graph *ngIf="graph" [dotSize]="3" [lineSize]="5" [roads]="true" #graph2Component ></app-graph>
         </div>
     </div>
 </div>
