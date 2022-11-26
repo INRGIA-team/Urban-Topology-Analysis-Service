@@ -68,11 +68,14 @@ def get_reversed_graph(graph, source='source', target='target', merging_column='
     merging_col = merging_column
 
     nx_graph = nx.from_pandas_edgelist(graph, source=source, target=target, edge_attr=edge_attr)
+    
+    adjacency_df = nx.to_pandas_adjacency(nx_graph, weight=merging_column)
+    
     union_and_delete(nx_graph)
 
     new_graph = reverse_graph(nx_graph)
-
-    return convert_to_df(new_graph, source=source, target=target)
+    edges_ds, nodes_df = convert_to_df(new_graph, source=source, target=target)
+    return edges_ds, nodes_df, adjacency_df
 
 
 def main():
@@ -81,18 +84,21 @@ def main():
     nodata = '-'
     merging_col = 'street_id'
 
-    graph = pd.read_csv("data/graph.csv")
+    graph = pd.read_csv("data/graph1.csv")
     nx_graph = nx.from_pandas_edgelist(graph, source='source', target='target', edge_attr=['street_id', 'street_name'])
+
+    adjacency_df = nx.to_pandas_adjacency(nx_graph, weight='street_id')
+    print('\nadjacency_df:\n', adjacency_df.head(7))
+    
     union_and_delete(nx_graph)
 
     new_graph = reverse_graph(nx_graph)
     draw_graph(new_graph)
-
+    
     edges_df, nodes_df = convert_to_df(new_graph, source='source', target='target')
-    print(edges_df.head(7))
-    print(nodes_df.head(7))
+    print('\nedges_df:\n', edges_df.head(7))
+    print('\nnodes_df:\n', nodes_df.head(7))
 
 
 if __name__ == '__main__':
     main()
-
