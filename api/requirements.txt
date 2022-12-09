@@ -1,0 +1,11 @@
+fastapi
+databases==0.6.2
+asyncpg
+SQLAlchemy
+psycopg2-binary
+uvicorn
+loguru
+pandas
+osmnx
+dadata
+osmium
