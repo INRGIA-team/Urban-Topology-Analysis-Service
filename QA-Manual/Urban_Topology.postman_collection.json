@@ -1,0 +1,168 @@
+{
+	"info": {
+		"_postman_id": "19c38686-52e9-4a1b-b10e-dd0df8afdb9b",
+		"name": "Urban_Topology",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23410793"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8002/docs/default/get_city_api_city__get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 0,\r\n  \"city_name\": \"string\",\r\n  \"property\": {\r\n    \"population\": 0,\r\n    \"population_density\": 0,\r\n    \"c_longitude\": 0,\r\n    \"c_latitude\": 0,\r\n    \"time_zone\": \"string\",\r\n    \"time_created\": \"string\"\r\n  },\r\n  \"downloaded\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8002/docs/default/get_city_api_city__get",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"docs",
+						"default",
+						"get_city_api_city__get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8002/api/city/?city_id=300",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 1,\r\n  \"city_name\": \"Москва\",\r\n  \"property\": {\r\n    \"population\": 11514330,\r\n    \"population_density\": 0,\r\n    \"c_longitude\": 37.6203735,\r\n    \"c_latitude\": 55.7538789,\r\n    \"time_zone\": \"UTC+3\",\r\n    \"time_created\": \"2022-12-08 19:54:24.262951\"\r\n  },\r\n  \"downloaded\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8002/api/city/?city_id=300",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"api",
+						"city",
+						""
+					],
+					"query": [
+						{
+							"key": "city_id",
+							"value": "300"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8002/api/cities/?page=25&per_page=1",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"id\": 0,\r\n    \"city_name\": \"string\",\r\n    \"property\": {\r\n      \"population\": 0,\r\n      \"population_density\": 0,\r\n      \"c_longitude\": 0,\r\n      \"c_latitude\": 0,\r\n      \"time_zone\": \"string\",\r\n      \"time_created\": \"string\"\r\n    },\r\n    \"downloaded\": false\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8002/api/cities/?page=25&per_page=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"api",
+						"cities",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "25"
+						},
+						{
+							"key": "per_page",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8002/api/cities/?page=1&per_page=5",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"id\": 0,\r\n    \"city_name\": \"string\",\r\n    \"property\": {\r\n      \"population\": 1216965,\r\n      \"population_density\": 0,\r\n      \"c_longitude\": 0,\r\n      \"c_latitude\": 0,\r\n      \"time_zone\": \"string\",\r\n      \"time_created\": \"string\"\r\n    },\r\n    \"downloaded\": false\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8002/api/cities/?page=2&per_page=6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"api",
+						"cities",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						},
+						{
+							"key": "per_page",
+							"value": "6"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
