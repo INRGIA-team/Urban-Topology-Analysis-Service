@@ -1,0 +1,94 @@
+<ISSPECS>
+  <DESCRIPTION>
+    <TITLE>Urban Topology Analysis Service</TITLE>
+    <SUBJ>Сервис по анализу городской топологии</SUBJ>
+  </DESCRIPTION>
+  <DATA>
+    <ENTITY ent_id="city">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>city_name</PROPERTY>
+      <PROPERTY>downloaded</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="city_properties">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>id_city</PROPERTY>
+      <PROPERTY>id_center</PROPERTY>
+      <PROPERTY>population</PROPERTY>
+      <PROPERTY>population_density</PROPERTY>
+      <PROPERTY>time_zone</PROPERTY>
+      <PROPERTY>time_added</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="way">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>id_city</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="way_property">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>id_way</PROPERTY>
+      <PROPERTY>id_property</PROPERTY>
+      <PROPERTY>value</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="point">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>longitude</PROPERTY>
+      <PROPERTY>latitude</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="point_property">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>id_point</PROPERTY>
+      <PROPERTY>id_property</PROPERTY>
+      <PROPERTY>value</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="edge">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>id_way</PROPERTY>
+      <PROPERTY>id_src</PROPERTY>
+      <PROPERTY>id_dst</PROPERTY>
+    </ENTITY>
+    <ENTITY ent_id="property">
+      <PROPERTY>id</PROPERTY>
+      <PROPERTY>property</PROPERTY>
+    </ENTITY>
+
+    <RELATIONSHIPS ent_ids = "city city_properties">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "city way">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "point city_properties">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "point point_property">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "point edge">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "way way_property">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "way edge">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "property way_property">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <RELATIONSHIPS ent_ids = "property point_property">
+      <PROPERTY>ONE TO MANY</PROPERTY>
+    </RELATIONSHIPS>
+    <CONSTRAINT> Ограничение NOT NULL повсеместно</CONSTRAINT>
+  </DATA>
+  <TECHSPEC>
+    <TYPE>Web-development</TYPE>
+    <DEVTOOLS>
+      <DEV>Python FastApi</DEV>
+      <DEV>Python SQLAlcheme</DEV>
+    </DEVTOOLS>
+    <DBMS>
+      <TITLE>PostgreSQL</TITLE>
+      <VERSION>14</VERSION>
+      <REASONING>Удобное взаимодействие с входными данными.</REASONING>
+    </DBMS>
+  </TECHSPEC>
+</ISSPECS>
